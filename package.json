@@ -9,8 +9,9 @@
     "validate": "node src/cli.mjs validate",
     "test": "node --test",
     "build": "node src/cli.mjs build",
-    "dev": "node src/cli.mjs build && node src/server.mjs",
-    "serve": "node src/server.mjs",
+    "dev": "pnpm --dir frontend dev",
+    "serve": "pnpm --dir frontend start",
+    "frontend:build": "pnpm --dir frontend build",
     "link-check": "node src/cli.mjs link-check"
   }
 }

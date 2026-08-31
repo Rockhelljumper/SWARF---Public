@@ -11,14 +11,16 @@ pnpm install
 pnpm validate
 pnpm test
 pnpm build
-pnpm dev
+go -C backend test ./...
+pnpm --dir frontend install
+pnpm --dir frontend build
 ```
 
 The initial site intentionally renders an empty state until a human-approved publication package is merged. A package is accepted only when it is not a preview, its manifest digest is valid, files match their source digests, and no unexpected files exist under `generated/`.
 
 ## Local Docker preview
 
-The Private control-plane repository carries the shared local Compose file. It builds this repository alone—without a private source mount—and publishes it only on `http://127.0.0.1:3102`. From the sibling `SWARF---Private` directory, use `docker compose -f docker-compose.local.yml up --build --detach`; use `docker compose -f docker-compose.local.yml down` to stop it.
+The Private control-plane repository carries the shared local Compose file. It runs this repository’s Next.js frontend and its separate Go catalog API without a private source mount, and publishes the resulting application only on `http://127.0.0.1:3102`. From the sibling `SWARF---Private` directory, use `docker compose -f docker-compose.local.yml up --build --detach`; use `docker compose -f docker-compose.local.yml down` to stop it.
 
 ## Publication contract
 
