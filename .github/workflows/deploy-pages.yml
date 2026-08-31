@@ -1,0 +1,14 @@
+name: Deploy pages (disabled until configured)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deployment-not-configured:
+    name: public-deployment-not-configured
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deployment is intentionally disabled pending DNS ownership, deployment-target selection, and repository settings."
