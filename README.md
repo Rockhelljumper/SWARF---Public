@@ -16,6 +16,10 @@ pnpm dev
 
 The initial site intentionally renders an empty state until a human-approved publication package is merged. A package is accepted only when it is not a preview, its manifest digest is valid, files match their source digests, and no unexpected files exist under `generated/`.
 
+## Local Docker preview
+
+The Private control-plane repository carries the shared local Compose file. It builds this repository alone—without a private source mount—and publishes it only on `http://127.0.0.1:3102`. From the sibling `SWARF---Private` directory, use `docker compose -f docker-compose.local.yml up --build --detach`; use `docker compose -f docker-compose.local.yml down` to stop it.
+
 ## Publication contract
 
 The private publisher may create a public branch and pull request using a narrowly scoped GitHub App. It cannot merge, bypass branch protections, or read the private repository from public CI. The package’s stable catalog lives at `generated/catalog.json` and the built catalog at `dist/catalog.json` for portfolio consumers.
