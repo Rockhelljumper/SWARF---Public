@@ -10,13 +10,15 @@ export const canonical = (value) => JSON.stringify(sortValue(value));
 const sortValue = (value) => Array.isArray(value) ? value.map(sortValue) : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map((key) => [key, sortValue(value[key])])) : value;
 export const writeData = (path, data) => { mkdirSync(dirname(path), { recursive: true }); writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`); };
 const readData = (path) => JSON.parse(readFileSync(path, 'utf8'));
-function filesUnder(root) {
+function filesUnder(root, ignoredDirectories = new Set()) {
   if (!existsSync(root)) return [];
   const out = [];
   for (const entry of readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     const path = join(root, entry.name); const stat = lstatSync(path);
     if (stat.isSymbolicLink()) throw new Error(`Generated publication contains a symlink: ${path}`);
-    if (stat.isDirectory()) out.push(...filesUnder(path)); else if (stat.isFile()) out.push(path);
+    if (stat.isDirectory()) {
+      if (!ignoredDirectories.has(entry.name)) out.push(...filesUnder(path, ignoredDirectories));
+    } else if (stat.isFile()) out.push(path);
   }
   return out;
 }
@@ -78,7 +80,8 @@ export function buildSite(root, output = join(root, 'dist')) {
 }
 export function checkLinks(root) {
   const findings = [];
-  for (const path of filesUnder(root).filter((item) => ['.md', '.mdx'].includes(extname(item)))) {
+  const generatedDirectories = new Set(['.git', '.next', 'dist', 'node_modules']);
+  for (const path of filesUnder(root, generatedDirectories).filter((item) => ['.md', '.mdx'].includes(extname(item)))) {
     const body = readFileSync(path, 'utf8'); for (const match of body.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) if (match[1].startsWith('http')) continue; else if (match[1].startsWith('/')) continue; else if (!existsSync(resolve(dirname(path), match[1]))) findings.push(`${relative(root, path)} has missing local link ${match[1]}`);
   }
   return { ok: findings.length === 0, findings };
